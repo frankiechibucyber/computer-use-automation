@@ -1,0 +1,2 @@
+# Capability registry: discovered artifacts land here as <name>.artifact.json.
+# One file per reusable capability; the calling agent lists this directory to see what it can do.

@@ -1,0 +1,6 @@
+# Pinned to the versions the system was built and verified against.
+# After install, run: python -m playwright install chromium
+playwright==1.62.0
+pydantic==2.13.4
+PyYAML==6.0.3
+pytest==9.1.1

@@ -1,0 +1,25 @@
+# Safety policy — DATA, not code (brief §3.6). The one place a reviewer/auditor reads and edits
+# what the system is allowed to do. Loaded by cua.policy.Guard; enforced at a single choke point.
+#
+# allowed_ops:            the only operations any agent (or the discovery LLM) may perform.
+# allowed_url_prefixes:   actions are refused unless the live URL is under one of these. This is the
+#                         blast-radius fence — automation cannot wander off the sanctioned surface.
+#                         Overridden at runtime by the CLI to the concrete --target (R027: no
+#                         machine-specific absolute path baked into the deliverable).
+# risky_control_names:    irreversible / high-impact controls. Refused for `automation`; permitted
+#                         only for a human `operator` who has explicitly confirmed.
+
+allowed_ops:
+  - fill
+  - click
+  - select
+  - navigate
+
+allowed_url_prefixes: []   # set per-run by the CLI from --target
+
+risky_control_names:
+  - Confirm Open
+  - Confirm Transfer
+  - Transfer
+  - Delete
+  - Wire

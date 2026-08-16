@@ -1,0 +1,6 @@
+{"step": 0, "action": {"op": "fill", "name": "Member ID", "value": "12345"}, "aria_len": 291}
+{"step": 1, "action": {"op": "click", "name": "Search"}, "aria_len": 314}
+{"step": 2, "action": {"op": "click", "name": "Open Sub-Account"}, "aria_len": 545}
+{"step": 3, "action": {"op": "select", "name": "Account Type", "value": "Checking"}, "aria_len": 768}
+{"step": 4, "action": {"op": "fill", "name": "Initial Deposit", "value": "500"}, "aria_len": 780}
+{"step": 5, "action": {"op": "click", "name": "Review"}, "aria_len": 797}

@@ -1,0 +1,35 @@
+# Discovery tasks — DATA describing what to discover, so adding a new capability is a YAML edit,
+# not a code change. Each task gives the LLM a goal and gives the recorder the typed frame the
+# emitted artifact must fill: params, known values to canonicalize, the success checkpoint,
+# outputs to extract, known business outcomes, and recoverable conditions.
+#
+# `known` maps a concrete value the operator would type -> the param name it should become, so the
+# artifact is reusable across inputs/tenants instead of frozen to one member id.
+
+lookup_member_savings_balance:
+  goal: "look up member 12345 and read their current savings balance"
+  params: {member_id: string}
+  known: {"12345": member_id}
+  checkpoint: "Savings Balance"
+  replay_params: {member_id: "12345"}
+  extracts:
+    - {name: savings_balance, row_label: "Savings Balance"}
+  business_outcomes:
+    - {code: NO_SUCH_MEMBER, detect_alert_text: "Record not found"}
+    - {code: PERMISSION_DENIED, detect_alert_text: "Permission denied"}
+  recoverables:
+    - {kind: interstitial, detect: "Confirm you have consent", action: "Continue"}
+    - {kind: transient, detect: "Temporarily unavailable", max_retries: 3}
+    - {kind: session_timeout, detect: "Session expired", action: "Re-authenticate", no_reload: true}
+
+open_sub_account:
+  goal: >
+    Open a new sub-account for member 12345: set Account Type to Checking,
+    Initial Deposit to 500, and reach the review screen.
+  params: {member_id: string, account_type: string, initial_deposit: string}
+  known: {"12345": member_id, "Checking": account_type, "500": initial_deposit}
+  checkpoint: "Review Sub-Account"
+  replay_params: {member_id: "12345", account_type: "Checking", initial_deposit: "500"}
+  extracts: []
+  business_outcomes: []
+  recoverables: []

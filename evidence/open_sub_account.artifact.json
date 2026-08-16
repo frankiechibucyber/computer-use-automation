@@ -1,0 +1,72 @@
+{
+  "schema_version": "0.1",
+  "name": "open_sub_account",
+  "params": {
+    "member_id": "string",
+    "account_type": "string",
+    "initial_deposit": "string"
+  },
+  "steps": [
+    {
+      "op": "fill",
+      "target": {
+        "role": "textbox",
+        "name": "Member ID"
+      },
+      "value_param": "member_id"
+    },
+    {
+      "op": "click",
+      "target": {
+        "role": "button",
+        "name": "Search"
+      }
+    },
+    {
+      "op": "click",
+      "target": {
+        "role": "button",
+        "name": "Open Sub-Account"
+      }
+    },
+    {
+      "op": "select",
+      "target": {
+        "role": "combobox",
+        "name": "Account Type"
+      },
+      "value_param": "account_type",
+      "option_label": "Checking"
+    },
+    {
+      "op": "fill",
+      "target": {
+        "role": "textbox",
+        "name": "Initial Deposit"
+      },
+      "value_param": "initial_deposit"
+    },
+    {
+      "op": "click",
+      "target": {
+        "role": "button",
+        "name": "Review"
+      }
+    }
+  ],
+  "extracts": [],
+  "checkpoint": {
+    "kind": "text_visible",
+    "text": "Review Sub-Account"
+  },
+  "business_outcomes": [],
+  "recoverables": [],
+  "provenance": {
+    "discovered_at": "2026-08-16T19:37:08Z",
+    "model": "openai/gpt-4o-mini",
+    "target": "file:///workspace/target/hostile.html",
+    "cost_usd": 0.000392,
+    "prompt_tokens": 2316,
+    "completion_tokens": 75
+  }
+}

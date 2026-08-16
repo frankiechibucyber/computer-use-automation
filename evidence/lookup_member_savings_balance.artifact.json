@@ -1,0 +1,74 @@
+{
+  "schema_version": "0.1",
+  "name": "lookup_member_savings_balance",
+  "params": {
+    "member_id": "string"
+  },
+  "steps": [
+    {
+      "op": "fill",
+      "target": {
+        "role": "textbox",
+        "name": "Member ID"
+      },
+      "value_param": "member_id"
+    },
+    {
+      "op": "click",
+      "target": {
+        "role": "button",
+        "name": "Search"
+      }
+    }
+  ],
+  "extracts": [
+    {
+      "name": "savings_balance",
+      "row_label": "Savings Balance"
+    }
+  ],
+  "checkpoint": {
+    "kind": "text_visible",
+    "text": "Savings Balance"
+  },
+  "business_outcomes": [
+    {
+      "code": "NO_SUCH_MEMBER",
+      "detect_alert_text": "Record not found"
+    },
+    {
+      "code": "PERMISSION_DENIED",
+      "detect_alert_text": "Permission denied"
+    }
+  ],
+  "recoverables": [
+    {
+      "kind": "interstitial",
+      "detect": "Confirm you have consent",
+      "action": "Continue",
+      "max_retries": 2,
+      "no_reload": false
+    },
+    {
+      "kind": "transient",
+      "detect": "Temporarily unavailable",
+      "max_retries": 3,
+      "no_reload": false
+    },
+    {
+      "kind": "session_timeout",
+      "detect": "Session expired",
+      "action": "Re-authenticate",
+      "max_retries": 2,
+      "no_reload": true
+    }
+  ],
+  "provenance": {
+    "discovered_at": "2026-08-16T20:00:36Z",
+    "model": "openai/gpt-4o-mini",
+    "target": "file:///workspace/target/hostile.html",
+    "cost_usd": 0.000095,
+    "prompt_tokens": 534,
+    "completion_tokens": 25
+  }
+}

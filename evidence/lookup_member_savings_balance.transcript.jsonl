@@ -1,0 +1,2 @@
+{"step": 0, "action": {"op": "fill", "name": "Member ID", "value": "12345"}, "aria_len": 291}
+{"step": 1, "action": {"op": "click", "name": "Search"}, "aria_len": 314}

@@ -1,0 +1,11 @@
+{
+  "model": "openai/gpt-4o-mini",
+  "steps_recorded": 2,
+  "attempted": 2,
+  "succeeded": 2,
+  "self_replay_ok": true,
+  "wall_s": 2.88,
+  "prompt_tokens": 534,
+  "completion_tokens": 25,
+  "cost_usd": 9.5e-05
+}

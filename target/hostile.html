@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>CoreBank Member Servicing (legacy)</title></head>
+<body>
+<!-- A deliberately "legacy" back-office surface used as the target for discovery/replay:
+     table-based layout, no data-testid, non-semantic wrappers. Accessible names come from
+     aria-label / button text only, so the system is forced to key on the accessibility tree
+     exactly as it would on a real legacy bank app.
+
+     Special member IDs exercise the runtime states the brief cares about:
+       12345, 67890  -> normal success
+       99999         -> permission denied            (business outcome)
+       55555         -> consent interstitial          (recoverable: dismiss dialog)
+       77777         -> transient failure then success (recoverable: bounded retry)
+       88888         -> session expired                (recoverable: re-auth, then retry w/o reload)
+       66666         -> slow load (~1.2s)              (recoverable: web-first wait)
+       00000         -> load never resolves            (hard failure: checkpoint timeout)
+       (anything else)-> record not found              (business outcome)
+     The empty #reload-btn has NO accessible name, forcing the locator fallback chain past role+name. -->
+<table border="1" cellpadding="6">
+  <tr><td colspan="2"><b>Member Servicing Console</b></td></tr>
+  <tr>
+    <td>Member ID</td>
+    <td><input aria-label="Member ID" id="q" type="text"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><button onclick="lookup()">Search</button>
+        <button id="reload-btn" onclick="lookup()" style="width:20px;height:20px"></button></td>
+  </tr>
+</table>
+<div id="result"></div>
+<script>
+  var DB = {
+    "12345": {name: "Jane Doe",   savings: "$4,210.55"},
+    "67890": {name: "John Smith", savings: "$88.10"},
+    "55555": {name: "Ada Lovelace", savings: "$1,000.00"},
+    "77777": {name: "Alan Turing",  savings: "$2,718.28"},
+    "88888": {name: "Grace Hopper", savings: "$9,999.99"},
+    "66666": {name: "Katherine Johnson", savings: "$3,141.59"}
+  };
+  var DENIED = ["99999"];
+  var attempts = {};
+  var pendingId = null;
+  window.reauthed = false;
+  function reauth() { window.reauthed = true; }
+
+  function renderBalance(m) {
+    document.getElementById('result').innerHTML =
+      '<table border="1" cellpadding="6">' +
+      '<tr><td>Member Name</td><td>' + m.name + '</td></tr>' +
+      '<tr><td>Savings Balance</td><td>' + m.savings + '</td></tr>' +
+      '</table>' +
+      '<button onclick="openSubAccount()">Open Sub-Account</button>';
+  }
+  function openSubAccount() {
+    document.getElementById('result').innerHTML =
+      '<table border="1" cellpadding="6">' +
+      '<tr><td>Account Type</td><td>' +
+        '<select aria-label="Account Type">' +
+        '<option value="">--</option><option>Checking</option><option>Savings</option><option>Money Market</option>' +
+        '</select></td></tr>' +
+      '<tr><td>Initial Deposit</td><td><input aria-label="Initial Deposit" type="text"></td></tr>' +
+      '<tr><td></td><td><button onclick="reviewSubAccount()">Review</button></td></tr>' +
+      '</table>';
+  }
+  function reviewSubAccount() {
+    var t = document.querySelector('[aria-label="Account Type"]').value;
+    var d = document.querySelector('[aria-label="Initial Deposit"]').value;
+    if (!t || !d) { document.getElementById('result').innerHTML = '<div role="alert">All fields required</div>'; return; }
+    document.getElementById('result').innerHTML =
+      '<b>Review Sub-Account</b>' +
+      '<table border="1" cellpadding="6">' +
+      '<tr><td>Type</td><td>' + t + '</td></tr>' +
+      '<tr><td>Initial Deposit</td><td>' + d + '</td></tr>' +
+      '</table>' +
+      '<button onclick="alert(\'opened\')">Confirm Open</button>';
+  }
+  function confirmView() {
+    if (pendingId && DB[pendingId]) renderBalance(DB[pendingId]);
+    pendingId = null;
+  }
+  function lookup() {
+    var id = document.getElementById('q').value.trim();
+    var r = document.getElementById('result');
+    if (DENIED.indexOf(id) !== -1) { r.innerHTML = '<div role="alert">Permission denied</div>'; return; }
+    if (id === "55555") {
+      pendingId = id;
+      r.innerHTML = '<div role="dialog" aria-label="Consent required">' +
+        '<span>Confirm you have consent to view this record.</span> ' +
+        '<button onclick="confirmView()">Continue</button></div>';
+      return;
+    }
+    if (id === "77777") {
+      attempts[id] = (attempts[id] || 0) + 1;
+      if (attempts[id] < 2) { r.innerHTML = '<div role="alert">Temporarily unavailable</div>'; return; }
+      renderBalance(DB[id]); return;
+    }
+    if (id === "88888") {
+      if (!window.reauthed) {
+        r.innerHTML = '<div role="alert">Session expired</div>' +
+          '<button onclick="reauth()">Re-authenticate</button>';
+        return;
+      }
+      renderBalance(DB[id]); return;
+    }
+    if (id === "66666") {
+      r.innerHTML = '<div>Loading...</div>';
+      setTimeout(function(){ renderBalance(DB["66666"]); }, 1200);
+      return;
+    }
+    if (id === "00000") {
+      r.innerHTML = '<div>Loading...</div>';
+      return;
+    }
+    if (DB[id]) { renderBalance(DB[id]); }
+    else { r.innerHTML = '<div role="alert">Record not found</div>'; }
+  }
+</script>
+</body>
+</html>
