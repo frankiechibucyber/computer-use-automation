@@ -4,7 +4,7 @@
   "attempted": 6,
   "succeeded": 6,
   "self_replay_ok": true,
-  "wall_s": 5.59,
+  "wall_s": 7.55,
   "prompt_tokens": 2316,
   "completion_tokens": 75,
   "cost_usd": 0.000392

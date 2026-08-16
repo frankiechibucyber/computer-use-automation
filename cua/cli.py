@@ -22,6 +22,7 @@ from .evidence.writer import EvidenceWriter
 from .llm.client import LLMClient
 from .policy.guard import Guard, Policy
 from .replay.engine import ReplayConfig, replay
+from .reuse import specialize
 from .schema import (Artifact, BusinessOutcome, Checkpoint, Extract, Recoverable)
 from .surface.web import WebSurface
 
@@ -84,6 +85,9 @@ def cmd_replay(args) -> int:
         print(f"no such capability: {args.capability}", file=sys.stderr)
         return 2
     art = Artifact.model_validate_json(art_path.read_text())
+    overrides = json.loads(args.overrides) if args.overrides else {}
+    if overrides:                                  # reuse this capability on a tenant variant
+        art = specialize(art, overrides)
     if args.target:                                # allow retargeting the same capability
         art.provenance.target = args.target
     params = json.loads(args.params) if args.params else {}
@@ -94,7 +98,7 @@ def cmd_replay(args) -> int:
         res = replay(surf, art, params, cfg)
         if args.evidence:                              # persist the replay log while the page is live
             EvidenceWriter(args.evidence).write_replay(art, params, res, args.capability,
-                                                        screenshot_surface=surf)
+                                                        screenshot_surface=surf, overrides=overrides)
     finally:
         surf.close()
     print(res.model_dump_json(indent=2, exclude_none=True))
@@ -128,6 +132,8 @@ def main(argv=None) -> int:
     r.add_argument("capability", help="capability name in catalogs/capabilities/")
     r.add_argument("--params", help="JSON object of param values")
     r.add_argument("--target", help="override the target URL")
+    r.add_argument("--overrides", help="JSON object of per-tenant control-name overrides "
+                                       "(e.g. '{\"Search\":\"Find Member\"}')")
     r.add_argument("--timeout-ms", type=int, default=3000)
     r.add_argument("--evidence", nargs="?", const="evidence", default=None,
                    help="persist a redacted replay log (default dir: evidence/)")

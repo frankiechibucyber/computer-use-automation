@@ -29,8 +29,9 @@ implementation.
 - *Rules as data.* The allowlist, risky-control list, and discovery tasks live in
   `catalogs/*.yaml`, so a reviewer/auditor reads and changes policy without touching Python.
 - *One concrete surface, real depth.* Per the brief, a single vertical slice touching every core
-  requirement, with the load-bearing pieces (schema, replay+taxonomy, escalation) done for real and
-  heterogeneity/multi-tenant argued at the seam rather than built (§4).
+  requirement, with the load-bearing pieces (schema, replay+taxonomy, escalation) done for real,
+  surface heterogeneity argued at the seam, and multi-tenant reuse *demonstrated* on a second
+  reskinned surface (§4).
 
 ## 2. Artifact schema
 
@@ -92,17 +93,25 @@ missing the select.
 
 ## 4. Heterogeneity & multi-tenant
 
-This is argued at the seam we built, per the brief's "design, don't build" scope for §3.7.
+Surface heterogeneity is argued at the seam (per the brief's "design, don't build" scope for §3.7);
+multi-tenant reuse is **demonstrated** on a second surface.
 - **Other surfaces.** Everything above `Surface` (schema, replay, discovery, result contract) is
   surface-agnostic. `WebSurface` is the built implementation; a `LegacyWebSurface` (e.g. Citrix/HTML
   frames) or `DesktopSurface` (UIA/AX accessibility APIs — the desktop equivalent of the a11y tree,
   with `coords` as the vision fallback) slot in *without touching anything above the seam*. Because
   perception is already role+name+checkpoint, the artifact format needs no change.
-- **Multi-tenant reuse.** The same canonicalization that produces params is the reuse seam: one
-  discovered `open_sub_account` artifact runs against any institution's instance of that app by
-  supplying different param values and retargeting the URL (`replay --target ...`), no
-  re-discovery. Per-tenant divergence (a renamed button) shows up as a locator-rung downgrade — a
-  signal to re-discover that one flow, not a silent break.
+- **Multi-tenant reuse (demonstrated).** `target/hostile_tenantB.html` is the *same* vendor product
+  reskinned the way a second institution runs it, with `Search` relabelled `Find Member`.
+  `cua/reuse.py::specialize(base, overrides)` reuses the tenant-A capability on tenant B by applying
+  a one-line control override — no re-discovery. Retargeting is `replay --target ...`; the override
+  is `replay --overrides '{"Search":"Find Member"}'`. Both directions are tested
+  (`tests/test_tenant.py`): with the override the base artifact **succeeds** on tenant B; *without*
+  it, the renamed control is drift that **fails loud** (rung-1 role+name miss → hard failure the
+  caller sees), never a silent wrong action — because role+name is an identity match, not fuzzy. So
+  per-tenant divergence is either absorbed by a declared override or surfaced as a clear signal to
+  add one / re-discover that single flow; it is never a silent break. (A softer rewording that still
+  matches a lower locator rung shows up first as a rung *downgrade* recorded on the run — an early
+  warning before it ever fails.)
 
 ## 5. Escalation & handoff
 

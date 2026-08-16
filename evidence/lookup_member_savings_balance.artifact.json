@@ -64,11 +64,11 @@
     }
   ],
   "provenance": {
-    "discovered_at": "2026-08-16T20:00:36Z",
+    "discovered_at": "2026-08-16T23:41:17Z",
     "model": "openai/gpt-4o-mini",
     "target": "file:///workspace/target/hostile.html",
-    "cost_usd": 0.000095,
+    "cost_usd": 0.000094,
     "prompt_tokens": 534,
-    "completion_tokens": 25
+    "completion_tokens": 24
   }
 }

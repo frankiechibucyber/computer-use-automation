@@ -61,19 +61,24 @@ class EvidenceWriter:
         return paths
 
     def write_replay(self, art: Artifact, params: dict[str, str], result: Result, name: str,
-                     screenshot_surface=None) -> dict[str, str]:
+                     screenshot_surface=None, overrides: dict[str, str] | None = None) -> dict[str, str]:
         """Append one replay run to <name>.replay.jsonl and snapshot the outcome.
 
         Append (not overwrite) so a single evidence file can show several runs side by side — e.g.
         a success and a `business_outcome` — which is exactly the "one replay that hits an error/
         exceptional state" the brief wants demonstrated. Params and the whole record go through the
         redactor: a param could carry sensitive data, and evidence on disk must never leak it.
+
+        `target` and `overrides` are recorded too, so a cross-tenant replay (same capability, a
+        variant surface, a per-tenant control override) is self-explanatory in the log.
         """
         log_path = self.root / f"{name}.replay.jsonl"
         record = {
             "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "capability": art.name,
+            "target": art.provenance.target if art.provenance else None,
             "params": params,
+            "overrides": overrides or {},
             "executed_steps": [
                 {"op": s.op, "role": s.target.role, "name": s.target.name} for s in art.steps
             ],

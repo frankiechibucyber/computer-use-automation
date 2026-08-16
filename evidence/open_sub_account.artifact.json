@@ -62,7 +62,7 @@
   "business_outcomes": [],
   "recoverables": [],
   "provenance": {
-    "discovered_at": "2026-08-16T19:37:08Z",
+    "discovered_at": "2026-08-16T23:41:59Z",
     "model": "openai/gpt-4o-mini",
     "target": "file:///workspace/target/hostile.html",
     "cost_usd": 0.000392,

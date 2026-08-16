@@ -1,4 +1,4 @@
-"""The safety choke point (brief §3.6).
+"""The safety choke point (brief §3.4).
 
 Every action an agent (or the discovery LLM) wants to take passes through exactly one Guard.
 Single site on purpose: a guardrail scattered across call sites is a guardrail with gaps. Rules

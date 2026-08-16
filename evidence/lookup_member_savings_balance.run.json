@@ -4,8 +4,8 @@
   "attempted": 2,
   "succeeded": 2,
   "self_replay_ok": true,
-  "wall_s": 2.88,
+  "wall_s": 2.33,
   "prompt_tokens": 534,
-  "completion_tokens": 25,
-  "cost_usd": 9.5e-05
+  "completion_tokens": 24,
+  "cost_usd": 9.4e-05
 }

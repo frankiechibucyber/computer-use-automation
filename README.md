@@ -54,6 +54,12 @@ python -m cua.cli replay lookup_member_savings_balance --params '{"member_id":"9
 # A longer, 6-step flow with a dropdown and an irreversible final step:
 python -m cua.cli discover open_sub_account --target "$TARGET"
 python -m cua.cli replay  open_sub_account --params '{"member_id":"12345","account_type":"Checking","initial_deposit":"500"}'
+
+# 4) REUSE ACROSS TENANTS — run the SAME capability on a second institution's reskinned copy of the
+#    app (target/hostile_tenantB.html renamed "Search" to "Find Member"). One override, no re-record.
+TENANT_B="file://$(pwd)/target/hostile_tenantB.html"
+python -m cua.cli replay lookup_member_savings_balance --params '{"member_id":"12345"}' \
+  --target "$TENANT_B" --overrides '{"Search":"Find Member"}'
 ```
 
 A successful replay prints a JSON result — the status plus the values it read back, e.g.
@@ -92,6 +98,7 @@ cua/
   llm/               client.py — talks to the model; used only during discovery
   discovery/         agent.py — the record-once loop; stops loudly rather than dropping a step;
                      turns the concrete values typed during discovery into named inputs; replays its own output before saving it
+  reuse.py           specialize() — reuse one recording on another tenant's reskinned copy via a small override
   escalation/        handoff.py — who's in control, the structured "I'm stuck" request, and same-session takeover
   evidence/          writer.py — redacted logs, the saved recording, a cost summary, and screenshots
   cli.py             discover / replay / catalog
@@ -99,7 +106,8 @@ catalogs/
   policy.yaml        allowlist and risky-action names (data a reviewer can read and edit)
   tasks.yaml         discovery jobs (the goal plus its typed inputs and outputs) as data
   capabilities/      saved recordings land here (generated; git-ignored)
-target/hostile.html  the deliberately messy legacy page I test against
+target/hostile.html          the deliberately messy legacy page I test against
+target/hostile_tenantB.html  the same page reskinned as a second tenant (renamed control) for the reuse demo
 tests/               pytest suite
 evidence/            example discovery and replay logs (generated; git-ignored)
 ```

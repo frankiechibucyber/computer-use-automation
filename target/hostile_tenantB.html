@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Summit CU — Servicing Portal (legacy)</title></head>
+<body>
+<!-- TENANT B: the SAME vendor product as target/hostile.html, reskinned/rebranded the way a second
+     institution runs it. The behaviour and data are identical; the only difference is cosmetic —
+     the "Search" control is relabelled "Find Member". This is the stand-in for "two tenants running
+     the same vendor product" from the brief (§1, §3.7, §8): a base capability discovered on tenant A
+     should be REUSED here via a small per-tenant override, not re-recorded from scratch. The rename
+     is exactly the kind of per-tenant drift the design has to absorb (see cua/reuse.py). -->
+<table border="1" cellpadding="6">
+  <tr><td colspan="2"><b>Summit CU — Member Servicing</b></td></tr>
+  <tr>
+    <td>Member ID</td>
+    <td><input aria-label="Member ID" id="q" type="text"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><button onclick="lookup()">Find Member</button></td>
+  </tr>
+</table>
+<div id="result"></div>
+<script>
+  var DB = {
+    "12345": {name: "Jane Doe",   savings: "$4,210.55"},
+    "67890": {name: "John Smith", savings: "$88.10"},
+    "55555": {name: "Ada Lovelace", savings: "$1,000.00"}
+  };
+  var DENIED = ["99999"];
+  function renderBalance(m) {
+    document.getElementById('result').innerHTML =
+      '<table border="1" cellpadding="6">' +
+      '<tr><td>Member Name</td><td>' + m.name + '</td></tr>' +
+      '<tr><td>Savings Balance</td><td>' + m.savings + '</td></tr>' +
+      '</table>';
+  }
+  function lookup() {
+    var id = document.getElementById('q').value.trim();
+    var r = document.getElementById('result');
+    if (DENIED.indexOf(id) !== -1) { r.innerHTML = '<div role="alert">Permission denied</div>'; return; }
+    if (DB[id]) { renderBalance(DB[id]); }
+    else { r.innerHTML = '<div role="alert">Record not found</div>'; }
+  }
+</script>
+</body>
+</html>

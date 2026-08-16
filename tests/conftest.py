@@ -13,11 +13,17 @@ from cua.surface.web import WebSurface
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TARGET_URL = (ROOT / "target" / "hostile.html").as_uri()
+TENANT_B_URL = (ROOT / "target" / "hostile_tenantB.html").as_uri()
 
 
 @pytest.fixture(scope="session")
 def target_url() -> str:
     return TARGET_URL
+
+
+@pytest.fixture(scope="session")
+def tenant_b_url() -> str:
+    return TENANT_B_URL
 
 
 @pytest.fixture
